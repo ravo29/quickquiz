@@ -63,12 +63,21 @@ class _QuizGameScreenState extends State<QuizGameScreen> {
   @override
   Widget build(BuildContext context) {
     final category = MockQuizData.categoryById(widget.categoryId);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+    final isDesktop = screenWidth >= 900;
 
     if (_questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
-        body: const Center(
-          child: Text('Aucune question disponible pour ce thème.'),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(isDesktop ? 32 : 24),
+            child: Text(
+              'Aucune question disponible pour ce thème.',
+              style: TextStyle(fontSize: isDesktop ? 18 : 16),
+            ),
+          ),
         ),
       );
     }
@@ -78,32 +87,48 @@ class _QuizGameScreenState extends State<QuizGameScreen> {
         appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.emoji_events, color: Color(0xFF1877F2), size: 64),
-                const SizedBox(height: 16),
-                Text(
-                  'Score final : $_score / ${_questions.length}',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () => context.pop(),
-                      child: const Text('Retour aux thèmes'),
+            padding: EdgeInsets.all(isDesktop ? 32 : 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: isDesktop ? 500 : double.infinity),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.emoji_events,
+                    color: const Color(0xFF1877F2),
+                    size: isDesktop ? 80 : 64,
+                  ),
+                  SizedBox(height: isDesktop ? 24 : 16),
+                  Text(
+                    'Score final : $_score / ${_questions.length}',
+                    style: TextStyle(
+                      fontSize: isDesktop ? 24 : 20,
+                      fontWeight: FontWeight.w700,
                     ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: _restart,
-                      child: const Text('Rejouer'),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: isDesktop ? 32 : 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: isDesktop ? 56 : 48,
+                        child: OutlinedButton(
+                          onPressed: () => context.pop(),
+                          child: const Text('Retour aux thèmes'),
+                        ),
+                      ),
+                      SizedBox(width: isDesktop ? 16 : 12),
+                      SizedBox(
+                        height: isDesktop ? 56 : 48,
+                        child: ElevatedButton(
+                          onPressed: _restart,
+                          child: const Text('Rejouer'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -115,7 +140,7 @@ class _QuizGameScreenState extends State<QuizGameScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isDesktop ? 32 : isTablet ? 24 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -123,33 +148,41 @@ class _QuizGameScreenState extends State<QuizGameScreen> {
               value: (_currentIndex + 1) / _questions.length,
               backgroundColor: const Color(0xFFE4E6EB),
               color: const Color(0xFF1877F2),
-              minHeight: 6,
+              minHeight: isDesktop ? 8 : 6,
               borderRadius: BorderRadius.circular(4),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: isDesktop ? 12 : 8),
             Text(
               'Question ${_currentIndex + 1}/${_questions.length}',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: isDesktop ? 14 : 12,
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: isDesktop ? 24 : 16),
             Text(
               question.questionText,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: isDesktop ? 20 : isTablet ? 18 : 17,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: isDesktop ? 32 : 24),
             Expanded(
               child: ListView.builder(
                 itemCount: question.options.length,
                 itemBuilder: (context, index) {
-                  return AnswerButton(
-                    text: question.options[index],
-                    isSelected: _selectedIndex == index,
-                    isCorrect: index == question.correctAnswerIndex,
-                    showResult: _showResult,
-                    onTap: () => _selectAnswer(index),
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: isDesktop ? 12 : 10,
+                    ),
+                    child: AnswerButton(
+                      text: question.options[index],
+                      isSelected: _selectedIndex == index,
+                      isCorrect: index == question.correctAnswerIndex,
+                      showResult: _showResult,
+                      onTap: () => _selectAnswer(index),
+                    ),
                   );
                 },
               ),
@@ -157,12 +190,14 @@ class _QuizGameScreenState extends State<QuizGameScreen> {
             if (_showResult)
               SizedBox(
                 width: double.infinity,
+                height: isDesktop ? 56 : isTablet ? 52 : 48,
                 child: ElevatedButton(
                   onPressed: _nextQuestion,
                   child: Text(
                     _currentIndex < _questions.length - 1
                         ? 'Question suivante'
                         : 'Voir le résultat',
+                    style: TextStyle(fontSize: isDesktop ? 18 : 16),
                   ),
                 ),
               ),

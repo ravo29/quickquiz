@@ -35,6 +35,24 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     if (value.trim().length < 3) {
       return 'Minimum 3 caractères.';
     }
+    if (value.trim().length > 200) {
+      return 'Maximum 200 caractères.';
+    }
+    return null;
+  }
+
+  String? _answerValidator(String? value) {
+    final requiredResult = _requiredValidator(value);
+    if (requiredResult != null) return requiredResult;
+    
+    // Check if answer matches one of the options
+    final answer = value!.trim();
+    final option1 = _option1Controller.text.trim();
+    final option2 = _option2Controller.text.trim();
+    
+    if (answer != option1 && answer != option2) {
+      return 'La réponse doit correspondre exactement à une des options.';
+    }
     return null;
   }
 
@@ -112,9 +130,9 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
               ),
               CustomInputField(
                 label: 'Réponse correcte',
-                hint: 'Doit correspondre à une des options ci-dessus',
+                hint: 'Doit correspondre exactement à une des options ci-dessus',
                 controller: _correctAnswerController,
-                validator: _requiredValidator,
+                validator: _answerValidator,
               ),
               const SizedBox(height: 8),
               SizedBox(
