@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/mock_quiz_data.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/custom_input_field.dart';
 
 class AddQuestionScreen extends StatefulWidget {
@@ -11,137 +11,122 @@ class AddQuestionScreen extends StatefulWidget {
 
 class _AddQuestionScreenState extends State<AddQuestionScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final _questionController = TextEditingController();
   final _option1Controller = TextEditingController();
   final _option2Controller = TextEditingController();
-  final _correctAnswerController = TextEditingController();
-
-  String? _selectedCategoryId;
+  final _option3Controller = TextEditingController();
+  final _correctIndexController = TextEditingController();
 
   @override
   void dispose() {
     _questionController.dispose();
     _option1Controller.dispose();
     _option2Controller.dispose();
-    _correctAnswerController.dispose();
+    _option3Controller.dispose();
+    _correctIndexController.dispose();
     super.dispose();
   }
 
-  String? _requiredValidator(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Ce champ est obligatoire.';
-    }
-    if (value.trim().length < 3) {
-      return 'Minimum 3 caractères.';
-    }
-    if (value.trim().length > 200) {
-      return 'Maximum 200 caractères.';
-    }
-    return null;
-  }
-
-  String? _answerValidator(String? value) {
-    final requiredResult = _requiredValidator(value);
-    if (requiredResult != null) return requiredResult;
-    
-    // Check if answer matches one of the options
-    final answer = value!.trim();
-    final option1 = _option1Controller.text.trim();
-    final option2 = _option2Controller.text.trim();
-    
-    if (answer != option1 && answer != option2) {
-      return 'La réponse doit correspondre exactement à une des options.';
-    }
-    return null;
-  }
-
-  void _submit() {
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (_selectedCategoryId == null) {
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner un thème.')),
+        const SnackBar(
+          content: Text('Question validée et enregistrée avec succès !'),
+          backgroundColor: Colors.green,
+        ),
       );
-      return;
+      context.pop();
     }
-    if (!isValid) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Question ajoutée avec succès !')),
-    );
-
-    _formKey.currentState?.reset();
-    _questionController.clear();
-    _option1Controller.clear();
-    _option2Controller.clear();
-    _correctAnswerController.clear();
-    setState(() => _selectedCategoryId = null);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ajouter une question')),
+      appBar: AppBar(
+        title: const Text('Nouvelle Question'),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Thème',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedCategoryId,
-                decoration: const InputDecoration(
-                  hintText: 'Sélectionner un thème',
-                ),
-                items: MockQuizData.categories
-                    .map((c) => DropdownMenuItem(
-                          value: c.id,
-                          child: Text(c.title),
-                        ))
-                    .toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedCategoryId = value),
-              ),
-              const SizedBox(height: 16),
               CustomInputField(
-                label: 'Question',
-                hint: 'Ex : Quelle est la capitale du Japon ?',
+                label: 'Intitulé de la question',
+                hint: 'Ex: Quelle est la capitale de l\'Italie ?',
                 controller: _questionController,
-                validator: _requiredValidator,
-                maxLines: 2,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'Veuillez saisir l\'intitulé de la question.';
+                  }
+                  if (val.trim().length < 8) {
+                    return 'La question doit comporter au moins 8 caractères.';
+                  }
+                  if (!val.trim().endsWith('?')) {
+                    return 'La question doit se terminer par un point d\'interrogation (?).';
+                  }
+                  return null;
+                },
               ),
               CustomInputField(
-                label: 'Option 1',
-                hint: 'Ex : Tokyo',
+                label: 'Option 1 (Index 0)',
+                hint: 'Ex: Rome',
                 controller: _option1Controller,
-                validator: _requiredValidator,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'L\'option 1 ne peut pas être vide.';
+                  }
+                  return null;
+                },
               ),
               CustomInputField(
-                label: 'Option 2',
-                hint: 'Ex : Osaka',
+                label: 'Option 2 (Index 1)',
+                hint: 'Ex: Milan',
                 controller: _option2Controller,
-                validator: _requiredValidator,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'L\'option 2 ne peut pas être vide.';
+                  }
+                  return null;
+                },
               ),
               CustomInputField(
-                label: 'Réponse correcte',
-                hint: 'Doit correspondre exactement à une des options ci-dessus',
-                controller: _correctAnswerController,
-                validator: _answerValidator,
+                label: 'Option 3 (Index 2)',
+                hint: 'Ex: Naples',
+                controller: _option3Controller,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'L\'option 3 ne peut pas être vide.';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.save_outlined),
-                  label: const Text('Enregistrer'),
-                  onPressed: _submit,
+              CustomInputField(
+                label: 'Index de la bonne réponse (0, 1 ou 2)',
+                hint: 'Saisissez 0, 1 ou 2',
+                controller: _correctIndexController,
+                keyboardType: TextInputType.number,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'Veuillez indiquer l\'index de la réponse correcte.';
+                  }
+                  final parsed = int.tryParse(val.trim());
+                  if (parsed == null || parsed < 0 || parsed > 2) {
+                    return 'L\'index doit être strictement égal à 0, 1 ou 2.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1877F2),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
+                onPressed: _submitForm,
+                child: const Text('Enregistrer la Question', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),

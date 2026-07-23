@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Champ de saisie réutilisable avec label et validation intégrée,
-/// utilisé dans le formulaire de AddQuestionScreen.
 class CustomInputField extends StatelessWidget {
   final String label;
   final String hint;
@@ -27,7 +25,7 @@ class CustomInputField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 6),
         TextFormField(
@@ -37,7 +35,10 @@ class CustomInputField extends StatelessWidget {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 13),
+            hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../services/mock_quiz_data.dart';
-import '../models/question.dart';
 import '../widgets/answer_button.dart';
 
 class QuizGameScreen extends StatefulWidget {
@@ -14,193 +13,127 @@ class QuizGameScreen extends StatefulWidget {
 }
 
 class _QuizGameScreenState extends State<QuizGameScreen> {
-  late final List<Question> _questions;
-  int _currentIndex = 0;
+  int _currentQuestionIndex = 0;
   int _score = 0;
-  int? _selectedIndex;
-  bool _showResult = false;
-  bool _quizFinished = false;
+  bool _isFinished = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _questions = MockQuizData.questionsForCategory(widget.categoryId);
-  }
+  void _answerQuestion(int selectedIndex, int correctAnswerIndex) {
+    if (selectedIndex == correctAnswerIndex) {
+      _score++;
+    }
 
-  void _selectAnswer(int index) {
-    if (_showResult) return;
-    setState(() {
-      _selectedIndex = index;
-      _showResult = true;
-      if (_questions[_currentIndex].isCorrect(index)) {
-        _score++;
-      }
-    });
-  }
-
-  void _nextQuestion() {
-    if (_currentIndex < _questions.length - 1) {
+    final questions = MockQuizData.questionsByCategory[widget.categoryId] ?? [];
+    if (_currentQuestionIndex + 1 < questions.length) {
       setState(() {
-        _currentIndex++;
-        _selectedIndex = null;
-        _showResult = false;
+        _currentQuestionIndex++;
       });
     } else {
-      setState(() => _quizFinished = true);
+      setState(() {
+        _isFinished = true;
+      });
     }
-  }
-
-  void _restart() {
-    setState(() {
-      _currentIndex = 0;
-      _score = 0;
-      _selectedIndex = null;
-      _showResult = false;
-      _quizFinished = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = MockQuizData.categoryById(widget.categoryId);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= 600;
-    final isDesktop = screenWidth >= 900;
+    final questions = MockQuizData.questionsByCategory[widget.categoryId] ?? [];
 
-    if (_questions.isEmpty) {
+    if (questions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
+        appBar: AppBar(title: const Text('Quiz')),
+        body: const Center(
+          child: Text('Aucune question disponible pour ce thème.'),
+        ),
+      );
+    }
+
+    if (_isFinished) {
+      final percentage = (_score / questions.length) * 100;
+
+      return Scaffold(
+        appBar: AppBar(title: const Text('Résultat')),
         body: Center(
           child: Padding(
-            padding: EdgeInsets.all(isDesktop ? 32 : 24),
-            child: Text(
-              'Aucune question disponible pour ce thème.',
-              style: TextStyle(fontSize: isDesktop ? 18 : 16),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/logoquiz.png',
+                  height: 80,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.emoji_events, size: 80, color: Color(0xFF1877F2)),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Quiz Terminé !',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Score : $_score / ${questions.length} (${percentage.toStringAsFixed(0)}%)',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1877F2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  onPressed: () => context.go('/categories'),
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Retour aux Thèmes'),
+                ),
+              ],
             ),
           ),
         ),
       );
     }
 
-    if (_quizFinished) {
-      return Scaffold(
-        appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(isDesktop ? 32 : 24),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: isDesktop ? 500 : double.infinity),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.emoji_events,
-                    color: const Color(0xFF1877F2),
-                    size: isDesktop ? 80 : 64,
-                  ),
-                  SizedBox(height: isDesktop ? 24 : 16),
-                  Text(
-                    'Score final : $_score / ${_questions.length}',
-                    style: TextStyle(
-                      fontSize: isDesktop ? 24 : 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: isDesktop ? 32 : 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: isDesktop ? 56 : 48,
-                        child: OutlinedButton(
-                          onPressed: () => context.pop(),
-                          child: const Text('Retour aux thèmes'),
-                        ),
-                      ),
-                      SizedBox(width: isDesktop ? 16 : 12),
-                      SizedBox(
-                        height: isDesktop ? 56 : 48,
-                        child: ElevatedButton(
-                          onPressed: _restart,
-                          child: const Text('Rejouer'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    final question = _questions[_currentIndex];
+    final currentQuestion = questions[_currentQuestionIndex];
 
     return Scaffold(
-      appBar: AppBar(title: Text(category?.title ?? 'Quiz')),
+      appBar: AppBar(
+        title: Text('Question ${_currentQuestionIndex + 1}/${questions.length}'),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(isDesktop ? 32 : isTablet ? 24 : 20),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             LinearProgressIndicator(
-              value: (_currentIndex + 1) / _questions.length,
-              backgroundColor: const Color(0xFFE4E6EB),
+              value: (_currentQuestionIndex + 1) / questions.length,
               color: const Color(0xFF1877F2),
-              minHeight: isDesktop ? 8 : 6,
-              borderRadius: BorderRadius.circular(4),
+              minHeight: 6,
             ),
-            SizedBox(height: isDesktop ? 12 : 8),
-            Text(
-              'Question ${_currentIndex + 1}/${_questions.length}',
-              style: TextStyle(
-                fontSize: isDesktop ? 14 : 12,
-                color: Theme.of(context).textTheme.bodySmall?.color,
+            const SizedBox(height: 24),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  currentQuestion.questionText,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-            SizedBox(height: isDesktop ? 24 : 16),
-            Text(
-              question.questionText,
-              style: TextStyle(
-                fontSize: isDesktop ? 20 : isTablet ? 18 : 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: isDesktop ? 32 : 24),
+            const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: question.options.length,
+                itemCount: currentQuestion.options.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      bottom: isDesktop ? 12 : 10,
-                    ),
-                    child: AnswerButton(
-                      text: question.options[index],
-                      isSelected: _selectedIndex == index,
-                      isCorrect: index == question.correctAnswerIndex,
-                      showResult: _showResult,
-                      onTap: () => _selectAnswer(index),
+                  return AnswerButton(
+                    optionText: currentQuestion.options[index],
+                    onPressed: () => _answerQuestion(
+                      index,
+                      currentQuestion.correctAnswerIndex,
                     ),
                   );
                 },
               ),
             ),
-            if (_showResult)
-              SizedBox(
-                width: double.infinity,
-                height: isDesktop ? 56 : isTablet ? 52 : 48,
-                child: ElevatedButton(
-                  onPressed: _nextQuestion,
-                  child: Text(
-                    _currentIndex < _questions.length - 1
-                        ? 'Question suivante'
-                        : 'Voir le résultat',
-                    style: TextStyle(fontSize: isDesktop ? 18 : 16),
-                  ),
-                ),
-              ),
           ],
         ),
       ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/quiz_category.dart';
 
-/// Carte réutilisable affichant un thème de culture générale.
-/// Utilisée dans le GridView de QuizListScreen.
 class CategoryCard extends StatelessWidget {
   final QuizCategory category;
   final VoidCallback onTap;
@@ -15,44 +13,36 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Card(
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-Container(
-  width: 44,
-  height: 44,
-  decoration: BoxDecoration(
-    color: category.color.withValues(alpha: isDark ? 0.25 : 0.12),
-    borderRadius: BorderRadius.circular(12),
-  ),
-  child: Icon(category.icon, color: category.color, size: 24),
-),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: category.color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(category.icon, size: 36, color: category.color),
+              ),
               const SizedBox(height: 12),
               Text(
                 category.title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 category.description,
+                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
           ),

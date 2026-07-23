@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'router/app_router.dart';
-import 'services/theme_notifier.dart';
+import 'themes/app_theme.dart';
 
 void main() {
   runApp(const QuickQuizApp());
@@ -10,16 +10,16 @@ class QuickQuizApp extends StatelessWidget {
   const QuickQuizApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext  context) {
     return ValueListenableBuilder<ThemeMode>(
-      valueListenable: themeNotifier,
-      builder: (context, currentMode, _) {
+      valueListenable: AppRouter.themeModeNotifier,
+      builder: (context, currentThemeMode, child) {
         return MaterialApp.router(
           title: 'QuickQuiz',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: currentMode,
+          themeMode: currentThemeMode,
           routerConfig: AppRouter.router,
         );
       },

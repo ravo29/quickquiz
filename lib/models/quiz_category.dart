@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Modèle représentant un thème (catégorie) de culture générale.
 class QuizCategory {
   final String id;
   final String title;

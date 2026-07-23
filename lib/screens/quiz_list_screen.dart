@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../router/app_router.dart';
 import '../services/mock_quiz_data.dart';
-import '../models/quiz_category.dart';
 import '../widgets/category_card.dart';
 
 class QuizListScreen extends StatefulWidget {
@@ -13,71 +11,93 @@ class QuizListScreen extends StatefulWidget {
 }
 
 class _QuizListScreenState extends State<QuizListScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _query = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  List<QuizCategory> get _filteredCategories {
-    if (_query.trim().isEmpty) return MockQuizData.categories;
-    final q = _query.toLowerCase();
-    return MockQuizData.categories
-        .where((c) =>
-            c.title.toLowerCase().contains(q) ||
-            c.description.toLowerCase().contains(q))
-        .toList();
-  }
-
-  int _crossAxisCountFor(double width) {
-    if (width >= 900) return 4; // grand écran / tablette paysage
-    if (width >= 600) return 3; // tablette
-    return 2; // mobile
-  }
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = _crossAxisCountFor(width);
-    final categories = _filteredCategories;
+    final filteredCategories = MockQuizData.categories.where((cat) {
+      final query = _searchQuery.toLowerCase().trim();
+      return cat.title.toLowerCase().contains(query) ||
+          cat.description.toLowerCase().contains(query);
+    }).toList();
+
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+
+    int crossAxisCount = 2;
+    double childAspectRatio = 0.9;
+
+    if (screenWidth > 900) {
+      crossAxisCount = 4;
+      childAspectRatio = 1.1;
+    } else if (screenWidth > 600) {
+      crossAxisCount = 3;
+      childAspectRatio = 1.0;
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Thèmes de culture générale')),
+      appBar: AppBar(
+        title: const Text('Thèmes de Quiz'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _query = value),
-              decoration: const InputDecoration(
-                hintText: 'Rechercher un thème...',
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                hintText: 'Rechercher un thème (ex: Histoire, Géographie)...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: categories.isEmpty
-                  ? const Center(child: Text('Aucun thème trouvé.'))
+              child: filteredCategories.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.search_off, size: 64, color: Colors.grey),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Aucun thème ne correspond à "$_searchQuery"',
+                            style: const TextStyle(color: Colors.grey, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    )
                   : GridView.builder(
-                      itemCount: categories.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: crossAxisCount,
-                        mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        childAspectRatio: 0.95,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: childAspectRatio,
                       ),
+                      itemCount: filteredCategories.length,
                       itemBuilder: (context, index) {
-                        final category = categories[index];
+                        final category = filteredCategories[index];
                         return CategoryCard(
                           category: category,
-                          onTap: () => context.goNamed(
-                            AppRouter.quizGame,
-                            pathParameters: {'categoryId': category.id},
-                          ),
+                          onTap: () => context.push('/game/${category.id}'),
                         );
                       },
                     ),

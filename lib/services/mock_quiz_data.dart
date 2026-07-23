@@ -2,183 +2,97 @@ import 'package:flutter/material.dart';
 import '../models/question.dart';
 import '../models/quiz_category.dart';
 
-/// Source unique des données mockées de Culture Générale.
-/// Aucune donnée n'est écrite en dur dans les écrans : tout passe par ce service.
 class MockQuizData {
-  MockQuizData._();
-
   static const List<QuizCategory> categories = [
     QuizCategory(
       id: 'geo',
       title: 'Géographie',
-      description: 'Pays, capitales, reliefs et frontières du monde.',
+      description: 'Capitales, pays, fleuves et merveilles du monde.',
       icon: Icons.public,
       color: Color(0xFF1877F2),
     ),
     QuizCategory(
-      id: 'histoire',
+      id: 'hist',
       title: 'Histoire',
-      description: 'Grands événements et figures historiques.',
-      icon: Icons.account_balance,
-      color: Color(0xFF42B72A),
+      description: 'Grandes civilisations, dynasties et événements majeurs.',
+      icon: Icons.history_edu,
+      color: Color(0xFF1877F2),
     ),
     QuizCategory(
-      id: 'sciences',
+      id: 'sci',
       title: 'Sciences & Nature',
-      description: 'Physique, biologie et phénomènes naturels.',
-      icon: Icons.eco,
-      color: Color(0xFF00A8E8),
+      description: 'Physique, chimie, astronomie et faune sauvage.',
+      icon: Icons.science,
+      color: Color(0xFF1877F2),
     ),
     QuizCategory(
-      id: 'arts',
+      id: 'art',
       title: 'Arts & Littérature',
-      description: 'Peinture, écrivains et courants artistiques.',
-      icon: Icons.palette,
-      color: Color(0xFFF7B928),
+      description: 'Peinture classique, romans célèbres et poésie.',
+      icon: Icons.menu_book,
+      color: Color(0xFF1877F2),
     ),
     QuizCategory(
-      id: 'cinema',
-      title: 'Cinéma',
-      description: 'Films cultes, réalisateurs et récompenses.',
+      id: 'cine',
+      title: 'Cinéma & Pop Culture',
+      description: 'Films cultes, acteurs, séries et musique.',
       icon: Icons.movie,
-      color: Color(0xFFE41E3F),
+      color: Color(0xFF1877F2),
     ),
   ];
 
-  static const List<Question> questions = [
-    // Géographie
-    Question(
-      id: 'q1',
-      categoryId: 'geo',
-      questionText: 'Quelle est la capitale de l\'Australie ?',
-      options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'],
-      correctAnswerIndex: 2,
-    ),
-    Question(
-      id: 'q2',
-      categoryId: 'geo',
-      questionText: 'Quel est le plus long fleuve du monde ?',
-      options: ['Amazone', 'Nil', 'Yangtsé', 'Mississippi'],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q3',
-      categoryId: 'geo',
-      questionText: 'Combien de continents compte-t-on généralement ?',
-      options: ['5', '6', '7', '8'],
-      correctAnswerIndex: 2,
-    ),
-    // Histoire
-    Question(
-      id: 'q4',
-      categoryId: 'histoire',
-      questionText: 'En quelle année a eu lieu la prise de la Bastille ?',
-      options: ['1789', '1792', '1804', '1815'],
-      correctAnswerIndex: 0,
-    ),
-    Question(
-      id: 'q5',
-      categoryId: 'histoire',
-      questionText: 'Qui était le premier empereur romain ?',
-      options: ['Jules César', 'Auguste', 'Néron', 'Trajan'],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q6',
-      categoryId: 'histoire',
-      questionText: 'Quelle guerre s\'est terminée en 1918 ?',
-      options: [
-        'Guerre de Sécession',
-        'Première Guerre mondiale',
-        'Guerre de Crimée',
-        'Guerre franco-prussienne',
-      ],
-      correctAnswerIndex: 1,
-    ),
-    // Sciences & Nature
-    Question(
-      id: 'q7',
-      categoryId: 'sciences',
-      questionText: 'Quelle planète est surnommée la "planète rouge" ?',
-      options: ['Vénus', 'Mars', 'Jupiter', 'Saturne'],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q8',
-      categoryId: 'sciences',
-      questionText: 'Quel gaz les plantes absorbent-elles pour la photosynthèse ?',
-      options: ['Oxygène', 'Azote', 'Dioxyde de carbone', 'Hydrogène'],
-      correctAnswerIndex: 2,
-    ),
-    Question(
-      id: 'q9',
-      categoryId: 'sciences',
-      questionText: 'Combien d\'os compte le corps humain adulte ?',
-      options: ['186', '206', '226', '246'],
-      correctAnswerIndex: 1,
-    ),
-    // Arts & Littérature
-    Question(
-      id: 'q10',
-      categoryId: 'arts',
-      questionText: 'Qui a peint "La Nuit étoilée" ?',
-      options: ['Monet', 'Van Gogh', 'Picasso', 'Renoir'],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q11',
-      categoryId: 'arts',
-      questionText: 'Qui a écrit "Les Misérables" ?',
-      options: ['Émile Zola', 'Victor Hugo', 'Albert Camus', 'Molière'],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q12',
-      categoryId: 'arts',
-      questionText: 'À quel mouvement artistique appartient Salvador Dalí ?',
-      options: ['Cubisme', 'Surréalisme', 'Impressionnisme', 'Baroque'],
-      correctAnswerIndex: 1,
-    ),
-    // Cinéma
-    Question(
-      id: 'q13',
-      categoryId: 'cinema',
-      questionText: 'Qui a réalisé "Inception" ?',
-      options: [
-        'Steven Spielberg',
-        'Christopher Nolan',
-        'Martin Scorsese',
-        'James Cameron',
-      ],
-      correctAnswerIndex: 1,
-    ),
-    Question(
-      id: 'q14',
-      categoryId: 'cinema',
-      questionText: 'Quel film a remporté l\'Oscar du meilleur film en 2020 (cérémonie) ?',
-      options: ['1917', 'Joker', 'Parasite', 'Once Upon a Time in Hollywood'],
-      correctAnswerIndex: 2,
-    ),
-    Question(
-      id: 'q15',
-      categoryId: 'cinema',
-      questionText: 'Dans quel studio a été produit "Toy Story" ?',
-      options: ['DreamWorks', 'Pixar', 'Illumination', 'Blue Sky Studios'],
-      correctAnswerIndex: 1,
-    ),
-  ];
-
-  /// Retourne toutes les questions liées à une catégorie donnée.
-  static List<Question> questionsForCategory(String categoryId) {
-    return questions.where((q) => q.categoryId == categoryId).toList();
-  }
-
-  /// Retourne une catégorie via son id, ou null si absente.
-  static QuizCategory? categoryById(String id) {
-    try {
-      return categories.firstWhere((c) => c.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  static const Map<String, List<Question>> questionsByCategory = {
+    'geo': [
+      Question(
+        id: 'g1',
+        questionText: 'Quelle est la capitale du Japon ?',
+        options: ['Kyoto', 'Tokyo', 'Osaka', 'Nagoya'],
+        correctAnswerIndex: 1,
+      ),
+      Question(
+        id: 'g2',
+        questionText: 'Quel est le plus long fleuve du monde ?',
+        options: ['Le Mississipi', 'Le Nil', 'L’Amazone', 'Le Yangtze'],
+        correctAnswerIndex: 2,
+      ),
+    ],
+    'hist': [
+      Question(
+        id: 'h1',
+        questionText: 'En quelle année a eu lieu la Révolution Française ?',
+        options: ['1789', '1799', '1815', '1776'],
+        correctAnswerIndex: 0,
+      ),
+      Question(
+        id: 'h2',
+        questionText: 'Qui était le premier empereur de Rome ?',
+        options: ['Jules César', 'Auguste', 'Néron', 'Marc Aurèle'],
+        correctAnswerIndex: 1,
+      ),
+    ],
+    'sci': [
+      Question(
+        id: 's1',
+        questionText: 'Quel est le symbole chimique de l\'or ?',
+        options: ['Ag', 'Fe', 'Au', 'Cu'],
+        correctAnswerIndex: 2,
+      ),
+    ],
+    'art': [
+      Question(
+        id: 'a1',
+        questionText: 'Qui a peint La Joconde ?',
+        options: ['Vincent van Gogh', 'Léonard de Vinci', 'Claude Monet', 'Pablo Picasso'],
+        correctAnswerIndex: 1,
+      ),
+    ],
+    'cine': [
+      Question(
+        id: 'c1',
+        questionText: 'Quel film a remporté l\'Oscar du meilleur film en 2020 ?',
+        options: ['1917', 'Parasite', 'Joker', 'Once Upon a Time in Hollywood'],
+        correctAnswerIndex: 1,
+      ),
+    ],
+  };
 }
