@@ -23,11 +23,11 @@ class AppTheme {
       foregroundColor: Colors.black87,
       elevation: 0,
     ),
-    cardTheme: CardThemeData( // <-- Remplacé CardTheme par CardThemeData
+    cardTheme: const CardThemeData( // <-- Utiliser CardThemeData
       color: lightCardBg,
       elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
   );
@@ -47,11 +47,11 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
     ),
-    cardTheme: CardThemeData( // <-- Remplacé CardTheme par CardThemeData
+    cardTheme: const CardThemeData( // <-- Utiliser CardThemeData
       color: darkCardBg,
       elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
   );

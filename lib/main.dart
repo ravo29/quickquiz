@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'router/app_router.dart';
 import 'themes/app_theme.dart';
 
+
 void main() {
   runApp(const QuickQuizApp());
 }
